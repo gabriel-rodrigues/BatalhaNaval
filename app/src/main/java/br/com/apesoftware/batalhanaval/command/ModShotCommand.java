@@ -7,10 +7,9 @@ import br.com.apesoftware.batalhanaval.game.Tabuleiro;
  * Created by gabriel.rodrigues on 06/10/17.
  */
 
-public class ModFireCommand extends ModCommand {
+public class ModShotCommand extends ModCommand {
 
-
-    public ModFireCommand(Tabuleiro tabuleiro) {
+    public ModShotCommand(Tabuleiro tabuleiro) {
         super(tabuleiro);
     }
 

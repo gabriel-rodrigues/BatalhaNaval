@@ -2,9 +2,9 @@ package br.com.apesoftware.batalhanaval.game;
 
 import android.support.annotation.Nullable;
 
-import java.net.PortUnreachableException;
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * Created by gabriel.rodrigues on 03/10/17.
@@ -16,7 +16,9 @@ public class Tabuleiro {
     private List<Point> mFirePoints  = new ArrayList<>();
 
     private boolean mModeIsFire;
+    private boolean mNecessaryToRedesign;
 
+    private final int COUNT_MAX_POINTS_WITH_NAVY = 4;
 
     public Tabuleiro() {
         this.setModeIsFire(false);
@@ -70,7 +72,16 @@ public class Tabuleiro {
 
     public boolean maxOfPoints() {
 
-        return this.mNavisPoints.size() == 4;
+        int countPointWithNavys = 0;
+
+        for (Point point: this.mNavisPoints) {
+             if(point.getNavy() != null) {
+                 ++countPointWithNavys;
+             }
+        }
+
+
+        return countPointWithNavys == COUNT_MAX_POINTS_WITH_NAVY;
     }
 
 
@@ -80,5 +91,13 @@ public class Tabuleiro {
 
     public boolean isModeIsFire() {
         return this.mModeIsFire;
+    }
+
+    public boolean isNecessaryToRedesign() {
+        return this.mNecessaryToRedesign;
+    }
+
+    public void setNecessaryToRedesign(boolean isNecessary) {
+        this.mNecessaryToRedesign = isNecessary;
     }
 }

@@ -8,7 +8,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
@@ -19,9 +18,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import br.com.apesoftware.batalhanaval.R;
+import br.com.apesoftware.batalhanaval.command.ModCommand;
+import br.com.apesoftware.batalhanaval.factory.ModFactory;
 import br.com.apesoftware.batalhanaval.game.Point;
 import br.com.apesoftware.batalhanaval.game.Navy;
 import br.com.apesoftware.batalhanaval.game.Tabuleiro;
+import br.com.apesoftware.batalhanaval.game.songs.Song;
 
 /**
  * Created by gabriel.rodrigues on 02/10/17.
@@ -38,6 +40,7 @@ public class BatalhaNavalView extends View {
     private BatalhaNavalViewListener mListener;
     private Bitmap mImageFire;
     private Bitmap mImageWater;
+    private Song mSoung;
 
     private final int VAZIO   = 0;
     private final int COLUMNS = 10;
@@ -147,6 +150,7 @@ public class BatalhaNavalView extends View {
                     else {
                         canvas.drawBitmap(this.mImageWater, null, rect, null);
                     }
+
                 }
             }
         }
@@ -164,7 +168,7 @@ public class BatalhaNavalView extends View {
                 int y = point.getLine()   * getQuadrante();
 
 
-                if(this.mTabuleiro.existe(point)) {
+                if(this.mTabuleiro.existe(point) && this.isNecessaryDrawForAnothersPointsForSameNavy(point)) {
                     Navy navy                    = this.mTabuleiro.getNavyByPoint(point);
                     Rect retangulo               = new Rect(x, y, x + getQuadrante() * navy.getSize(), y + getQuadrante());
                     AppCompatImageView imageView = (AppCompatImageView) navy;
@@ -175,6 +179,11 @@ public class BatalhaNavalView extends View {
             }
         }
 
+    }
+
+    private boolean isNecessaryDrawForAnothersPointsForSameNavy(Point point) {
+
+        return this.mTabuleiro.getNavyByPoint(point) != null;
     }
 
     private void drawLinesVerticalIn(Canvas canvas) {
@@ -213,30 +222,14 @@ public class BatalhaNavalView extends View {
                 int line   = (int)(event.getY() / getQuadrante());
                 int column = (int)(event.getX() / getQuadrante());
 
-                Point point = new Point(line, column);
+                Point point            = new Point(line, column);
+                point.setNavy(getCurrencyNavyInGame());
 
+                ModCommand currencyMod = ModFactory.create(mTabuleiro);
+                currencyMod.setListener(mListener);
+                currencyMod.handlerWith(point);
 
-                if(!mTabuleiro.isModeIsFire()) {
-                    if (!mTabuleiro.maxOfPoints()) {
-                        if (!mTabuleiro.existe(point)) {
-                            point.setNavy(getCurrencyNavyInGame());
-                            mTabuleiro.add(point);
-
-                            if (mListener != null) {
-                                mListener.changeCurrencyNavyInGame();
-                            }
-
-                            invalidate();
-                        }
-
-                        if (mTabuleiro.maxOfPoints() && mListener != null) {
-                            mListener.showFeedbackPlayer();
-                            mTabuleiro.setModeIsFire(true);
-                        }
-                    }
-                }
-                else {
-                    mTabuleiro.addFire(point);
+                if(mTabuleiro.isNecessaryToRedesign()) {
                     invalidate();
                 }
 
